@@ -116,7 +116,7 @@ EV_ENTRY = DEAL["shares"] * DEAL["price"] + DEAL["old_notes"] - DEAL["cash"]
 print(f"Entry EV (equity + debt − cash): ${EV_ENTRY:,.0f}m = {EV_ENTRY / FIN.loc['adj_ebitda', 'FY2026']:.1f}x FY2026 adj. EBITDA")
 
 # %% [markdown]
-# ## 3-5. Operating model, debt schedule and returns
+# ## 3-6. Operating model, debt schedule, returns and ability to pay
 # Interest is charged on opening balances (no circularity). Mandatory amortisation first, then 100% of the remaining
 # cash above the minimum sweeps the prepayable loans in order (TLA, then the term loan Bs). Notes are bullets.
 
@@ -311,7 +311,7 @@ for t in DEBT.itertuples():
     wi.write(r, 1, t.tranche); wi.write(r, 2, t.amount, f_in); wi.write(r, 3, "Yes" if t.floating else "No", f_inb)
     wi.write(r, 4, t.rate, f_inp)
     base = R["sofr"] if t.base == "sofr" else R["euribor"] if t.base == "euribor" else "0"
-    wi.write_formula(r, 5, f'=IF(D{r + 1}="Yes",{base},0)+E{r + 1}', f_p)
+    wi.write_formula(r, 5, f'=IF(D{r + 1}="Yes",{base},0)+E{r + 1}' if base != "0" else f'=E{r + 1}', f_p)
     wi.write(r, 6, t.amort, f_inp); wi.write(r, 7, "Yes" if t.prepay else "No", f_inb)
     wi.write(r, 8, {"Term Loan A": "Spread assumed (not disclosed); 5% amortisation assumed"}.get(t.tranche, "Closing 8-K / syndication press"), f_note)
     r += 1
